@@ -1,0 +1,8 @@
+<snippet>
+	<content><![CDATA[
+${TPL_LDELIM:\{}elif ${1:condition}${TPL_RDELIM:\}}
+	$0
+]]></content>
+	<tabTrigger>elif</tabTrigger>
+	<scope>text.html.template,source.template</scope>
+</snippet>

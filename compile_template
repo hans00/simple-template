@@ -1,0 +1,91 @@
+#!/usr/bin/env php
+<?php
+
+include_once __DIR__ . '/libs/autoload.php';
+
+$parser = new Parser();
+$parser->add(
+	'v', 'verbose',
+	Parser::OPTION,
+	$verbose,
+	'Verbose run'
+);
+$parser->add(
+	'c', 'no-color',
+	Parser::OPTION,
+	$colorful,
+	'No color'
+);
+$parser->add(
+	'S', 'short',
+	Parser::OPTION,
+	$short,
+	'Short open PHP tag'
+);
+$parser->add(
+	's', 'source',
+	Parser::VARIABLE,
+	$src,
+	'Source path (default: ./templates_src)',
+	'path'
+);
+$parser->add(
+	'd', 'dist',
+	Parser::VARIABLE,
+	$dist,
+	'Dist path (default: ./templates)',
+	'path'
+);
+$parser->parse();
+
+new logging(!$colorful);
+
+if (!isset($src)) {
+	$src = './templates_src';
+	if ($verbose) logging::info('Source path not set, using default, "'.$src.'".');
+}
+
+if (!isset($dist)) {
+	$dist = './templates';
+	if ($verbose) logging::info('Dist path not set, using default, "'.$dist.'".');
+}
+
+if (!is_dir($src)) {
+	logging::error('"'.$src.'" is not directory.');
+	exit(1);
+}
+
+if (!is_dir($dist)) {
+	logging::error('"'.$dist.'" is not directory.');
+	exit(1);
+}
+
+glob2($src, $files);
+
+if (count($files) == 0) {
+	logging::info('Nothing in "'.$src.'".');
+	exit(0);
+}
+
+foreach ($files as &$path) {
+	if ($verbose) logging::info('Processing "'.$src.$path.'".');
+	$content = file_get_contents($src.$path);
+	$error = 0;
+	$content = run_all_functions_parser($content,
+		function ($msg) use ($error) {
+			$error = 1;
+			logging::error($msg);
+		}
+	);
+	if ($short) $content = preg_replace("/\<\?php/", '<?', $content);
+	$save_fn  = $dist.substr($path,0,-3).'phtml';
+	$save_dir = substr($save_fn, 0, -strlen(basename($save_fn)));
+	if (!is_dir($save_dir)) {
+		if ($verbose) logging::info('"'.$save_dir.'" not exist, create.');
+		mkdir($save_dir);
+	}
+	if ($verbose) logging::info('Done. Save to "'.$save_fn.'".');
+	file_put_contents($save_fn, minify($content));
+}
+
+logging::info('All done.');

@@ -1,0 +1,8 @@
+<snippet>
+	<content><![CDATA[
+${TPL_LDELIM:\{}else${TPL_RDELIM:\}}
+	$0
+]]></content>
+	<tabTrigger>else</tabTrigger>
+	<scope>text.html.template,source.template</scope>
+</snippet>

@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+${TPL_LDELIM:\{}foreach ${1:collection} in ${2:item}${TPL_RDELIM:\}}
+	$0
+${TPL_LDELIM:\{}/foreach${TPL_RDELIM:\}}
+]]></content>
+	<tabTrigger>foreach</tabTrigger>
+	<scope>text.html.template,source.template</scope>
+</snippet>

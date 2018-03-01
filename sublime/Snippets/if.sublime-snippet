@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+${TPL_LDELIM:\{}if ${1:condition}${TPL_RDELIM:\}}
+	$0
+${TPL_LDELIM:\{}/if${TPL_RDELIM:\}}
+]]></content>
+	<tabTrigger>if</tabTrigger>
+	<scope>text.html.template,source.template</scope>
+</snippet>
