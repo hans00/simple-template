@@ -13,7 +13,7 @@ function tpl_lost_syntax_check(string $code, callable $error_processor) {
 	exit(1);
 }
 
-function run_all_functions_parser(string $content, callable $error_processor) {
+function run_all_functions_parser(string $content, callable $error_processor, string $display='include') {
 	$tpl_var = '(?:[a-zA-Z_]\w*)';
 	$php_var_match = '(?:\$[a-zA-Z_]\w*)(?:(?:\.\w+|\[\"\S*\"\]|\[\'\S*\'\]|\[\d+\]|\[\$[a-zA-Z_]\w*(?:\.\w+)?\])*)?';
 	$functions = glob(__LIBS__ . '/functions/*.php');

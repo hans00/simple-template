@@ -1,7 +1,7 @@
 <?php
 
 $content = preg_replace_callback("/\{(el(?:se)?)?if +($php_var_match)(?: +((?:eq|ne|gt|lt|gte|lte) +($php_var_match|-?\d+|\'\S*\'|\"\S*\")|is +(defined|array|empty|file|true|TRUE|false|FALSE)|not +(defined|array|empty|file|true|TRUE|false|FALSE)))?\}/", function ($matches) {
-	$code = '<?php '.(($matches[1]!='')?'else ':'').'if ('.parse_var($matches[2]);
+	$code = '<?php '.(($matches[1]!='')?'else':'').'if ('.parse_var($matches[2]);
 	$comp = substr($matches[3], 0, 3);
 	switch ($comp) {
 		case 'eq ':
@@ -35,7 +35,7 @@ $content = preg_replace_callback("/\{(el(?:se)?)?if +($php_var_match)(?: +((?:eq
 			else $code .= $matches[4];
 			break;
 		case 'is ':
-			switch ($matches[4]) {
+			switch ($matches[5]) {
 				case 'defined':
 					$code = substr($code,0,10) . 'isset(' . substr($code,10) . ')';
 					break;
@@ -59,7 +59,7 @@ $content = preg_replace_callback("/\{(el(?:se)?)?if +($php_var_match)(?: +((?:eq
 			}
 			break;
 		case 'not':
-			switch ($matches[4]) {
+			switch ($matches[5]) {
 				case 'defined':
 					$code = substr($code,0,10) . '!isset(' . substr($code,10) . ')';
 					break;

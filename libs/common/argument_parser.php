@@ -8,7 +8,7 @@ class Parser
 	private $long_options  = ['help'];
 	private $options = [];
 
-	function add($short, $long, $type, &$variable, $description='', $var_name='var')
+	function add($short, $long, $type, &$variable, $description='', $default=NULL, $var_name='var')
 	{
 		if ($type == self::OPTION) {
 			$this->short_options .= $short;
@@ -18,13 +18,14 @@ class Parser
 			$this->short_options .= $short.':';
 			$this->long_options[] = $long.':';
 		}
+		$variable = $default;
 		$this->options[] = [
 			's' => $short,
 			'l' => $long,
 			'v' => &$variable,
 			't' => $type,
 			'd' => $description,
-			'vn' => $var_name
+			'vn' => $var_name,
 		];
 	}
 
@@ -42,10 +43,12 @@ class Parser
 			} else if (isset($options[$param['l']])) {
 				$val = $options[$param['l']];
 			}
-			if ($param['t'] == self::OPTION) {
-				$param['v'] = isset($val);
-			} else if ($param['t'] == self::VARIABLE) {
-				$param['v'] = $val;
+			if (isset($val)) {
+				if ($param['t'] == self::OPTION) {
+					$param['v'] = true;
+				} else if ($param['t'] == self::VARIABLE) {
+					$param['v'] = $val;
+				}
 			}
 		}
 	}
@@ -54,14 +57,13 @@ class Parser
 	{
 		echo 'Usage: ', $GLOBALS['argv'][0], ' [options]', PHP_EOL;
 		echo 'Options:', PHP_EOL;
-		$tpl1 = "    -%1s, --%-10s\t\t%-50s".PHP_EOL;
-		$tpl2 = "    -%1s, --%s <%s>\t\t%-50s".PHP_EOL;
-		printf($tpl1, 'h', 'help', 'Show this message');
+		$tpl = "    -%1s, --%-20s %-50s".PHP_EOL;
+		printf($tpl, 'h', 'help', 'Show this message');
 		foreach ($this->options as &$param) {
 			if ($param['t'] == self::OPTION)
-				printf($tpl1, $param['s'], $param['l'], $param['d']);
+				printf($tpl, $param['s'], $param['l'], $param['d']);
 			else
-				printf($tpl2, $param['s'], $param['l'], $param['vn'], $param['d']);
+				printf($tpl, $param['s'], $param['l'].' <'.$param['vn'].'>', $param['d']);
 		}
 		echo PHP_EOL;
 	}

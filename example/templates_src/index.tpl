@@ -5,7 +5,7 @@
 	<title>{$title}</title>
 </head>
 <body>
-	{display "menu.tpl"}
+	{display "another.tpl"}
 	{if $a is array}
 		<p>$a is array</p>
 	{/if}
@@ -27,14 +27,14 @@
 		<p>$a != $b</p>
 	{/if}
 	{* Print var *}
-	{$var}
-	{$array.var['a'][$a]["a"]}
+	<p>{$var}</p>
+	<p>{$array.a['a'][$b]["a"]}</p>
 	{* leftpad  Just using leftpad_<any><length> *}
-	{$var|leftpad_05}
+	<p>{$var|leftpad_05}</p>
 	{* array count *}
-	{$array|count}
+	<p>{$array|count}</p>
 	{* string length *}
-	{$str|len}
+	<p>{$str|len}</p>
 	<ul>
 		{for i=1 to 10}
 			<li>{$i|leftpad_02}</li>

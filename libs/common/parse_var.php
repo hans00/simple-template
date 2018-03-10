@@ -7,25 +7,43 @@ function parse_var($var_str) {
 	$arraystr = $matches[2];
 	$code = $varname;
 	if ($arraystr != '') {
-		$start = false;
+		$start = 0;
 		for ($i=0; $i < strlen($arraystr); $i++) { 
 			if (!$start) {
 				if ($arraystr[$i] == '.') {
-					$start = true;
+					$code .= '[\'';
+					$start = 1;
+				} elseif ($arraystr[$i+1] == '$') {
+					$code .= '[';
+					$start = 2;
 				} else {
-					$start = true;
-					$i++;
+					$code .= '[\'';
+					$start = 3;
 				}
-				$code .= '[\'';
 			} else {
-				if ($arraystr[$i] == '.') {
-					$code .= "']";
-					$start = false;
-				} elseif (in_array($arraystr[$i], ['"', "'"])) {
-					$code .= "']";
-					$start = false;
-					$i++;
-				} else {
+				switch ($start) {
+					case 1:
+						if (in_array($arraystr[$i], ['.', '['])) {
+							$code .= "']";
+							$start = 0;
+						}
+					break;
+					case 2:
+						if (in_array($arraystr[$i], ['.', ']'])) {
+							$code .= "]";
+							$start = 0;
+							$i++;
+						}
+					break;
+					case 3:
+						if (in_array($arraystr[$i], ['"', "'"])) {
+							$code .= "']";
+							$start = 0;
+							$i++;
+						}
+					break;
+				}
+				if ($start) {
 					$code .= $arraystr[$i];
 				}
 			}

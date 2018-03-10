@@ -17,16 +17,39 @@ $parser->add(
 	'No color'
 );
 $parser->add(
+	'm', 'minify',
+	Parser::OPTION,
+	$minify,
+	'Minify HTML'
+);
+$parser->add(
 	'S', 'short',
 	Parser::OPTION,
 	$short,
 	'Short open PHP tag'
 );
 $parser->add(
+	'a', 'src-ext',
+	Parser::VARIABLE,
+	$src_ext,
+	'Source ext name (default: tpl)',
+	'tpl',
+	'ext'
+);
+$parser->add(
+	'b', 'dist-ext',
+	Parser::VARIABLE,
+	$dist_ext,
+	'Dist ext name (default: phtml)',
+	'phtml',
+	'ext'
+);
+$parser->add(
 	's', 'source',
 	Parser::VARIABLE,
 	$src,
 	'Source path (default: ./templates_src)',
+	'./templates_src',
 	'path'
 );
 $parser->add(
@@ -34,21 +57,20 @@ $parser->add(
 	Parser::VARIABLE,
 	$dist,
 	'Dist path (default: ./templates)',
+	'./templates',
 	'path'
+);
+$parser->add(
+	'D', 'display',
+	Parser::VARIABLE,
+	$display,
+	'Display function or method (default: include)',
+	'include',
+	'func'
 );
 $parser->parse();
 
 new logging(!$colorful);
-
-if (!isset($src)) {
-	$src = './templates_src';
-	if ($verbose) logging::info('Source path not set, using default, "'.$src.'".');
-}
-
-if (!isset($dist)) {
-	$dist = './templates';
-	if ($verbose) logging::info('Dist path not set, using default, "'.$dist.'".');
-}
 
 if (!is_dir($src)) {
 	logging::error('"'.$src.'" is not directory.');
@@ -60,7 +82,7 @@ if (!is_dir($dist)) {
 	exit(1);
 }
 
-glob2($src, $files);
+glob2($src, $files, $src_ext);
 
 if (count($files) == 0) {
 	logging::info('Nothing in "'.$src.'".');
@@ -75,17 +97,19 @@ foreach ($files as &$path) {
 		function ($msg) use ($error) {
 			$error = 1;
 			logging::error($msg);
-		}
+		},
+		$display
 	);
 	if ($short) $content = preg_replace("/\<\?php/", '<?', $content);
-	$save_fn  = $dist.substr($path,0,-3).'phtml';
+	$save_fn  = $dist.substr($path,0,-strlen($src_ext)).$dist_ext;
 	$save_dir = substr($save_fn, 0, -strlen(basename($save_fn)));
 	if (!is_dir($save_dir)) {
 		if ($verbose) logging::info('"'.$save_dir.'" not exist, create.');
 		mkdir($save_dir);
 	}
 	if ($verbose) logging::info('Done. Save to "'.$save_fn.'".');
-	file_put_contents($save_fn, minify($content));
+	if ($minify) $content = minify($content);
+	file_put_contents($save_fn, $content);
 }
 
-logging::info('All done.');
+if ($verbose) logging::info('All done.');
